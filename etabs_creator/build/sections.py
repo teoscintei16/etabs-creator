@@ -14,11 +14,12 @@ def section_names(spec) -> dict[str, str]:
     """Numele sectiunilor care se definesc pentru acest model (cheile: material, column, beam, slab [+ wall, belt, cbeam, bwall])."""
     n = {"column": f"C{_cm(spec.column_b)}x{_cm(spec.column_h)}", "beam": f"B{_cm(spec.beam_b)}x{_cm(spec.beam_h)}",
          "slab": f"P{_cm(spec.slab_t)}", "material": spec.concrete}
-    if spec.belts and (spec.walls or spec.basement):
+    walls_on = spec.walls or spec.free_walls_on
+    if spec.belts and (walls_on or spec.basement):
         n["belt"] = "CENTURA"
-    if spec.walls:
+    if walls_on:
         n["wall"] = f"W{_cm(spec.wall_t)}"
-        if spec.coupled:
+        if spec.coupled and not spec.free_shape:
             n["cbeam"] = f"CB{_cm(spec.wall_t)}x{_cm(spec.coupling_h)}"
     if spec.basement:
         n["bwall"] = f"WB{_cm(spec.basement_wall_t)}"
@@ -48,7 +49,7 @@ def define_sections(sap, spec) -> dict[str, str]:
     if "wall" in n:
         ok(sap.PropArea.SetWall(n["wall"], 0, SHELL_THIN, mat, spec.wall_t), "SetWall")
     if "belt" in n:                          # centura: grinda „dummy” cat grosimea peretelui, fara masa/greutate proprie
-        ok(sap.PropFrame.SetRectangle(n["belt"], mat, BELT_H, spec.wall_t if spec.walls else spec.basement_wall_t), "SetRectangle (centură)")
+        ok(sap.PropFrame.SetRectangle(n["belt"], mat, BELT_H, spec.wall_t if (spec.walls or spec.free_walls_on) else spec.basement_wall_t), "SetRectangle (centură)")
     if "cbeam" in n:
         ok(sap.PropFrame.SetRectangle(n["cbeam"], mat, spec.coupling_h, spec.wall_t), "SetRectangle (grindă de cuplare)")
     if "bwall" in n:

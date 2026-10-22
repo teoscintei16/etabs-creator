@@ -2,7 +2,8 @@
 
 Generează modele ETABS (v22) conforme regulilor, pentru a testa verificatorul [etabs-check](https://github.com/teoscintei16/etabs-check):
 cadre, pereți izolați, pereți cuplați, nuclee de pereți (L, C, I, H, T), structuri duale, forme neregulate (L, retragere, goluri),
-subsol sub un plan mai mare decât turnul și mai multe turnuri.
+subsol sub un plan mai mare decât turnul, mai multe turnuri și **planuri libere**: cerc, elipsă, semicerc, poligon, trapez, formă cu lobi,
+spline închis prin puncte de control, piramide (reducere netedă sau în trepte), răsucire, înclinare, atriu central, pereți trapezoidali.
 
 Pornește o instanță ETABS **nouă**; nu înlocuiește niciodată modelul unui utilizator deschis în altă instanță.
 
@@ -21,7 +22,8 @@ Modelele se salvează în `generated_models/`, iar parametrii seismici și centu
 | Folder | Rol |
 |---|---|
 | `spec/` | specificația modelului, în părți mici (grilă, secțiuni, încărcări, rigiditate, seism, pereți, subsol, formă, turnuri) |
-| `plan/` | planul construcției, calcule pure (niveluri, turnuri, celule, pereți, nuclee, subsol) |
+| `plan/` | planul construcției ortogonale, calcule pure (niveluri, turnuri, celule, pereți, nuclee, subsol) |
+| `free/` | planul liber, calcule pure: contur (cerc, spline…), rețea radială de inele, transformări pe nivel (piramidă, răsucire) |
 | `seismic/` | spectrul P100-1, coeficientul seismic, combinațiile (pure) |
 | `build/` | crearea obiectelor în ETABS, nivel cu nivel (stâlpi/grinzi, pereți, subsol, planșee, rezemare) |
 | `rules/` | regulile aplicate după geometrie: fisurare, zone rigide, mesh, masă, moduri, spectru, forțe statice, combinații, calibrare |
@@ -44,3 +46,7 @@ Testele nu au nevoie de ETABS (obiecte false): `python -m unittest discover -s t
   Verificatorul semnalează corect „corpuri independente ≠ turnuri definite”.
 - Împingerea pământului e uniformă (simplificare); sensul se verifică vizual.
 - Parametrii seismici impliciți sunt orientativi (fără oraș): introdu valorile amplasamentului.
+- **Plan liber:** rețeaua e radială (inele de la centru la contur); conturul trebuie să fie stelat față de centroid. Coordonatele se rotunjesc la 1 mm.
+  ETABS acceptă etichete Pier doar pe pereți verticali: panourile înclinate (piramida cu reducere netedă) sunt „rampe” cu proprietate Wall, fără Pier.
+  Piramida în trepte are elemente verticale pe fiecare etaj, deci reazemă pe placă la fiecare treaptă (verificatorul semnalează corect lipsa continuității).
+  Stâlpii înclinați peste ~15° sunt clasificați de ETABS drept contravântuiri.

@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, field, fields
 
 from ..connect import GenError
 from .basement import BasementSpec
+from .freeform import FreeformSpec
 from .grid import GridSpec
 from .loads import LoadSpec
 from .sections import CONCRETE, SectionSpec
@@ -18,8 +19,9 @@ from .walls import CORE_SHAPES, WallSpec
 
 # numele partilor au prefix „p_” ca sa nu intre in conflict cu campurile plate (ex. campul `seismic`, `walls`, `basement`, `towers`, `shape`)
 PARTS = {"p_grid": GridSpec, "p_sections": SectionSpec, "p_loads": LoadSpec, "p_stiffness": StiffnessSpec, "p_seismic": SeismicSpec,
-         "p_walls": WallSpec, "p_basement": BasementSpec, "p_shape": ShapeSpec, "p_towers": TowerSpec}
-STRUCTURES = ("cadre", "pereti_izolati", "pereti_cuplati", "dual", "nucleu", "neregulat", "turnuri")
+         "p_walls": WallSpec, "p_basement": BasementSpec, "p_shape": ShapeSpec, "p_towers": TowerSpec, "p_free": FreeformSpec}
+STRUCTURES = ("cadre", "pereti_izolati", "pereti_cuplati", "dual", "nucleu", "neregulat", "turnuri",
+              "cerc", "semicerc", "elipsa", "spline", "trapez", "piramida", "piramida_trepte")
 
 
 def _field_owner() -> dict[str, str]:
@@ -48,6 +50,7 @@ class ModelSpec:
     p_basement: BasementSpec = field(default_factory=BasementSpec)
     p_shape: ShapeSpec = field(default_factory=ShapeSpec)
     p_towers: TowerSpec = field(default_factory=TowerSpec)
+    p_free: FreeformSpec = field(default_factory=FreeformSpec)
 
     # ---- acces plat: spec.stories, spec.wall_t, ...
     def __getattr__(self, name: str):
@@ -89,6 +92,12 @@ class ModelSpec:
             raise GenError(f"Tip de structură necunoscut: {self.structure}")
         for p in PARTS:
             getattr(self, p).validate()
+        if self.free_shape:                       # plan liber: validari proprii (contur stelat, laturi cu pereti), fara grila ortogonala
+            from ..free import build_free_plan
+            if self.towers.strip() or self.shape != "rect" or self.core_shape or self.coupled:
+                raise GenError("Planul liber nu se combină cu turnuri, forme L/retragere, nuclee sau grinzi de cuplare ale grilei ortogonale.")
+            build_free_plan(self)
+            return self
         from ..plan import build_plan             # validarile care cer grila si turnurile (amplasari, goluri, nuclee)
         build_plan(self)
         return self

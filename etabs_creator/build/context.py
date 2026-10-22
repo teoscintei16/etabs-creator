@@ -46,5 +46,10 @@ class Ctx:
         name = ok(self.sap.AreaObj.AddByCoord(4, px, py, [z0, z0, z1, z1], "", prop), f"AddByCoord ({what})")[-1]   # COM intoarce si tablourile X, Y, Z
         return name, px, py
 
+    def add_poly(self, pts: list[tuple[float, float, float]], prop: str, what: str) -> str:
+        """Arie cu oricate colturi (x, y, z), in ordinea data; intoarce numele."""
+        return ok(self.sap.AreaObj.AddByCoord(len(pts), [p[0] for p in pts], [p[1] for p in pts], [p[2] for p in pts], "", prop),
+                  f"AddByCoord ({what})")[-1]
+
     def restrain_panel_base(self, name: str) -> None:
         self.base_points += list(ok(self.sap.AreaObj.GetPoints(name), "AreaObj.GetPoints")[1][:2])

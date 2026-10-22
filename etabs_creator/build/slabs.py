@@ -14,15 +14,20 @@ def define_diaphragm_and_patterns(c: Ctx) -> None:
         pass                                  # exista deja
 
 
+def add_slab(c: Ctx, pts: list[tuple[float, float, float]]) -> str:
+    """Placa pe un poligon (orice nr. de colturi): diafragma D1 si incarcarile uniforme (permanent suplimentar, utila)."""
+    name = c.add_poly(pts, c.sec["slab"], "placă")
+    ok(c.sap.AreaObj.SetDiaphragm(name, "D1"), "AreaObj.SetDiaphragm")
+    if c.spec.dead_extra:
+        ok(c.sap.AreaObj.SetLoadUniform(name, "Permanenta", c.spec.dead_extra, SLAB_DIR_GRAVITY), "SetLoadUniform (perm.)")
+    if c.spec.live:
+        ok(c.sap.AreaObj.SetLoadUniform(name, "Live", c.spec.live, SLAB_DIR_GRAVITY), "SetLoadUniform (utilă)")
+    c.bump("placi")
+    return name
+
+
 def slabs(c: Ctx) -> None:
-    xs, ys, spec = c.xs, c.ys, c.spec
+    xs, ys = c.xs, c.ys
     for idx, st in enumerate(c.plan.stories):
         for i, j in c.plan.slab_cells(idx):
-            name = ok(c.sap.AreaObj.AddByCoord(4, [xs[i], xs[i + 1], xs[i + 1], xs[i]], [ys[j], ys[j], ys[j + 1], ys[j + 1]], [st.z_top] * 4, "",
-                                               c.sec["slab"]), "AddByCoord (placă)")[-1]
-            ok(c.sap.AreaObj.SetDiaphragm(name, "D1"), "AreaObj.SetDiaphragm")
-            if spec.dead_extra:
-                ok(c.sap.AreaObj.SetLoadUniform(name, "Permanenta", spec.dead_extra, SLAB_DIR_GRAVITY), "SetLoadUniform (perm.)")
-            if spec.live:
-                ok(c.sap.AreaObj.SetLoadUniform(name, "Live", spec.live, SLAB_DIR_GRAVITY), "SetLoadUniform (utilă)")
-            c.bump("placi")
+            add_slab(c, [(xs[i], ys[j], st.z_top), (xs[i + 1], ys[j], st.z_top), (xs[i + 1], ys[j + 1], st.z_top), (xs[i], ys[j + 1], st.z_top)])
