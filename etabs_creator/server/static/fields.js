@@ -9,7 +9,7 @@ const FIELDS = [
   ["Pereți structurali", [["walls", "Cu pereți", "checkbox"], ["wall_t", "Grosime perete (m)", "number"],
     ["wall_lines_x", "Linii cu pereți pe X (first,last,middle,all,none sau 0,2)", "text"], ["wall_bays_x", "Deschideri cu pereți pe X", "text"],
     ["wall_lines_y", "Linii cu pereți pe Y", "text"], ["wall_bays_y", "Deschideri cu pereți pe Y", "text"],
-    ["core_shape", "Nucleu de pereți (L, C, I, H, T)", "select"], ["core_cells", "Nucleu: i0,j0,nx,ny (gol = centrat)", "text"],
+    ["core_shape", "Nucleu de pereți (L, C, I, H, T)", "select"], ["core_cells", "Nucleu: i0,j0,nx,ny (gol = centrat)", "text"], ["walls_through_basement", "Pereții continuă în subsol (debifat = defect pentru test)", "checkbox"],
     ["gravity_frame", "Stâlpi și grinzi în afara pereților", "checkbox"], ["belts", "Centuri dummy deasupra pereților", "checkbox"],
     ["crack_wall_f", "Fisurare pereți f11,f22,f12", "number"], ["crack_wall_m", "Fisurare pereți m11,m22,m12", "number"]]],
   ["Pereți cuplați", [["coupling_bays_x", "Deschideri cu grinzi de cuplare pe X", "text"], ["coupling_bays_y", "Deschideri cu grinzi de cuplare pe Y", "text"],

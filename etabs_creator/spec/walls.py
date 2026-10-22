@@ -25,6 +25,7 @@ class WallSpec:
     coupling_h: float = 0.90                # m, inaltimea grinzii de cuplare (latimea = grosimea peretelui)
     core_shape: str = ""                    # nucleu de pereti: L | C | I | H | T („” = fara)
     core_cells: str = ""                    # „i0,j0,nx,ny” in coordonatele turnului (gol = centrat, ~jumatate din plan)
+    walls_through_basement: bool = True     # peretii turnului continua in subsol pana la baza; False = reazema pe placa (DEFECT, pentru a testa verificatorul)
 
     @property
     def coupled(self) -> bool:

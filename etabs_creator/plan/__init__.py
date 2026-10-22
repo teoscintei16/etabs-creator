@@ -45,6 +45,8 @@ class Plan:
         """[{"axis", "line", "bay", "pier"}] ale nivelului idx, doar unde segmentul e alipit de o celula activa a turnului lui.
         Peretii turnului continua in subsol (sub amprenta turnului la parter), cu aceeasi eticheta Pier."""
         out = []
+        if self.is_basement(idx) and not self.spec.walls_through_basement:
+            return out
         ref = self._first_above() if self.is_basement(idx) else idx
         for r in self.runs:
             cells = self.tower_cells[r["tower"] - 1][ref]

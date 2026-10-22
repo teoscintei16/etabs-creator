@@ -56,6 +56,11 @@ class TowerWallsContinueBelowTests(unittest.TestCase):
         self.assertEqual(sorted(piers), ["PX1"] * 3 + ["PX2"] * 3)
 
 
+    def test_defect_switch_leaves_tower_walls_on_the_ground_slab(self):
+        sap, res = build(bays=4, travei=3, stories=2, towers="1,0,2,3,2", basement=1, walls=True, wall_lines_x="first,last", wall_bays_x="middle",
+                         wall_lines_y="none", wall_bays_y="none", walls_through_basement=False)
+        self.assertEqual(res["objects"]["pereti"], 2 * 2)                                          # doar peste teren: reazema pe placa subsolului
+
     def test_no_duplicate_panel_where_a_tower_wall_meets_the_perimeter(self):
         sap, res = build(bays=3, travei=3, stories=1, basement=1, walls=True, wall_lines_x="first,last", wall_bays_x="middle", wall_lines_y="none", wall_bays_y="none")
         self.assertEqual(res["objects"]["pereti_subsol"], 12 - 2)                                  # 12 panouri de perimetru, 2 ocupate de peretii turnului
