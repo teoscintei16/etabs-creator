@@ -1,0 +1,25 @@
+"""Rigiditatea si setarile de analiza: fisurare, zone rigide, mesh, moduri."""
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from ..connect import GenError
+
+
+@dataclass
+class StiffnessSpec:
+    crack_col_I: float = 0.7                # fisurare (EC8 / P100-1): factori pe sectiuni
+    crack_col_J: float = 0.1
+    crack_beam_I: float = 0.5
+    crack_beam_J: float = 0.1
+    crack_slab: float = 0.5                 # m11 = m22 = m12
+    rigid_zone: float = 0.75                # factorul zonei rigide la capete
+    mesh_max: float = 0.5                   # m, dimensiunea maxima aproximativa a elementelor
+    modes_per_story: int = 3                # moduri pe etaj PESTE TEREN (subsolul rigid nu vibreaza)
+
+    def validate(self) -> None:
+        for f in ("crack_col_I", "crack_col_J", "crack_beam_I", "crack_beam_J", "crack_slab", "rigid_zone"):
+            if not 0 < getattr(self, f) <= 1:
+                raise GenError(f"„{f}” trebuie să fie între 0 (exclusiv) și 1.")
+        if self.mesh_max <= 0 or self.modes_per_story < 1:
+            raise GenError("Dimensiunea mesh-ului și numărul de moduri pe etaj trebuie să fie pozitive.")
