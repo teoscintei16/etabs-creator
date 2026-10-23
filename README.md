@@ -27,7 +27,11 @@ Modelele se salvează în `generated_models/`, iar parametrii seismici și centu
 | `seismic/` | spectrul P100-1, coeficientul seismic, combinațiile (pure) |
 | `build/` | crearea obiectelor în ETABS, nivel cu nivel (stâlpi/grinzi, pereți, subsol, planșee, rezemare) |
 | `rules/` | regulile aplicate după geometrie: fisurare, zone rigide, mesh, masă, moduri, spectru, forțe statice, combinații, calibrare |
-| `server/` | API FastAPI și pagina simplă (`static/`) |
+| `defects/` | defecte intenționate (`defects=nume1,nume2`) pentru a testa reparațiile verificatorului: moduri puține, Ritz fără accelerații, DOF oprite, mesh nestandard etc. |
+| `server/` | API FastAPI (`recovery.py`: ETABS repornit la fiecare 8 modele și reîncercare la „Invalid pointer”) și pagina simplă (`static/`) |
+
+Mesh-ul plăcilor: `mesh_floor=auto` → „General” la planuri libere (Rectangular lasă elemente-ciobuc), altfel „Rectangular”.
+Testarea cu verificatorul (matrice de structuri, reparații de la cap la cap): `scripts/` din proiectul etabs-check.
 
 Testele nu au nevoie de ETABS (obiecte false): `python -m unittest discover -s tests -t .`
 

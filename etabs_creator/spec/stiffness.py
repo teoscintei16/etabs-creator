@@ -15,11 +15,14 @@ class StiffnessSpec:
     crack_slab: float = 0.5                 # m11 = m22 = m12
     rigid_zone: float = 0.75                # factorul zonei rigide la capete
     mesh_max: float = 0.5                   # m, dimensiunea maxima aproximativa a elementelor
+    mesh_floor: str = "auto"                # optiunea de mesh a placilor: auto (General la plan liber, altfel Rectangular) | Rectangular | General
     modes_per_story: int = 3                # moduri pe etaj PESTE TEREN (subsolul rigid nu vibreaza)
 
     def validate(self) -> None:
         for f in ("crack_col_I", "crack_col_J", "crack_beam_I", "crack_beam_J", "crack_slab", "rigid_zone"):
             if not 0 < getattr(self, f) <= 1:
                 raise GenError(f"„{f}” trebuie să fie între 0 (exclusiv) și 1.")
+        if self.mesh_floor not in ("auto", "Rectangular", "General"):
+            raise GenError("Mesh-ul plăcilor: auto, Rectangular sau General.")
         if self.mesh_max <= 0 or self.modes_per_story < 1:
             raise GenError("Dimensiunea mesh-ului și numărul de moduri pe etaj trebuie să fie pozitive.")

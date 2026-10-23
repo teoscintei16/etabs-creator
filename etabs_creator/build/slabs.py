@@ -23,6 +23,7 @@ def add_slab(c: Ctx, pts: list[tuple[float, float, float]]) -> str:
     if c.spec.live:
         ok(c.sap.AreaObj.SetLoadUniform(name, "Live", c.spec.live, SLAB_DIR_GRAVITY), "SetLoadUniform (utilă)")
     c.bump("placi")
+    c.slabs.append(name)
     return name
 
 

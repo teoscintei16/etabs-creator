@@ -55,6 +55,14 @@ class RulesTests(unittest.TestCase):
         self.assertEqual(len(sap.calls("RespCombo.Add")), 47)
         self.assertEqual((res["project"]["ag"], res["project"]["lambda_mfse"]), (0.2, 0.85))
 
+    def test_floor_mesh_is_general_for_free_plans_and_rectangular_otherwise(self):
+        sap, _ = build(stories=2, bays=2, travei=2)
+        self.assertEqual(sap.DatabaseTables.t["Analysis Options - Automatic Mesh Settings for Floors"][1][0]["MeshOpt"], "Rectangular")
+        sap, _ = build(stories=2, free_shape="circle")
+        self.assertEqual(sap.DatabaseTables.t["Analysis Options - Automatic Mesh Settings for Floors"][1][0]["MeshOpt"], "General")
+        sap, _ = build(stories=2, free_shape="circle", mesh_floor="Rectangular")
+        self.assertEqual(sap.DatabaseTables.t["Analysis Options - Automatic Mesh Settings for Floors"][1][0]["MeshOpt"], "Rectangular")
+
     def test_modes_count_only_stories_above_ground(self):
         sap, _ = build(stories=4, bays=2, travei=2, basement=2)
         self.assertEqual(sap.calls("ModalEigen.SetNumberModes")[0], ("Modal", 12, 1))           # 3 × 4 etaje peste teren, subsolul nu vibreaza

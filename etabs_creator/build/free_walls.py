@@ -30,6 +30,7 @@ def wall_panels(c: Ctx, fp: FreePlan, idx: int) -> None:
         lo, hi = fp.levels(idx)
         if lo == hi:                                    # ETABS accepta eticheta Pier doar pe panouri verticale (cele inclinate sunt „rampe”)
             ok(c.sap.AreaObj.SetPier(name, w["pier"]), "AreaObj.SetPier")
+            c.pier_areas.append((name, w["pier"]))
         else:
             c.bump("pereti_inclinati")
         c.bump("pereti")

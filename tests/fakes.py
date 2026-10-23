@@ -39,6 +39,11 @@ class FakeTables:
                                                           [dict(UniqueName="W1", MeshOption="Default", Restraints="No")]),
             "Frame Assignments - End Length Offsets": (["UniqueName", "OffsetOpt", "OffsetI", "OffsetJ", "RigidFact", "SelfWtOpt"], []),
             "Frame Assignments - Insertion Point": (["UniqueName", "CardinalPt"], []),
+            "Point Object Connectivity": (["UniqueName", "IsAuto", "IsSpecial", "X", "Y", "Z"],
+                                          [dict(UniqueName="p1", IsAuto="No", IsSpecial="No", X="0", Y="0", Z="3"),
+                                           dict(UniqueName="p2", IsAuto="No", IsSpecial="No", X="5", Y="0", Z="3"),
+                                           dict(UniqueName="p3", IsAuto="No", IsSpecial="No", X="10", Y="0", Z="3"),
+                                           dict(UniqueName="p4", IsAuto="Yes", IsSpecial="Yes", X="1.234", Y="2", Z="3")]),
             "Mass Source Definition": (["Name", "IsDefault", "IncLateral", "IncVertical", "LumpMass", "SourceSelf", "SourceAdded", "SourceLoads",
                                         "MoveMass", "LoadPattern", "Multiplier"], [dict(Name="MsSrc1", SourceLoads="No")]),
             "Functions - Response Spectrum - User Defined": (["Name", "Period", "Value", "DampRatio"], [dict(Name="UnifRS", Period="0", Value="1", DampRatio="0.05")]),
@@ -93,7 +98,7 @@ class FakeSap:
         for n in ("File", "PropMaterial", "PropFrame", "PropArea", "FrameObj", "AreaObj", "PointObj", "Diaphragm", "View", "RespCombo", "PierLabel", "SpandrelLabel", "Analyze"):
             setattr(self, n, Rec(self.s, n + "."))
         self.LoadPatterns = Rec(self.s, "LoadPatterns.")
-        self.LoadCases = type("LC", (), {"ModalEigen": Rec(self.s, "ModalEigen."), "ResponseSpectrum": Rec(self.s, "RS.")})()
+        self.LoadCases = type("LC", (), {"ModalEigen": Rec(self.s, "ModalEigen."), "ModalRitz": Rec(self.s, "Ritz."), "ResponseSpectrum": Rec(self.s, "RS.")})()
         self.Story = type("St", (), {"GetNameList": staticmethod(lambda: self.story_names()), "SetStories_2": staticmethod(self.set_stories)})()
         self.DatabaseTables = FakeTables(lambda: self.s.get("frames", []))
 

@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, field, fields
 
 from ..connect import GenError
 from .basement import BasementSpec
+from .defects import DefectSpec
 from .freeform import FreeformSpec
 from .grid import GridSpec
 from .loads import LoadSpec
@@ -19,7 +20,7 @@ from .walls import CORE_SHAPES, WallSpec
 
 # numele partilor au prefix „p_” ca sa nu intre in conflict cu campurile plate (ex. campul `seismic`, `walls`, `basement`, `towers`, `shape`)
 PARTS = {"p_grid": GridSpec, "p_sections": SectionSpec, "p_loads": LoadSpec, "p_stiffness": StiffnessSpec, "p_seismic": SeismicSpec,
-         "p_walls": WallSpec, "p_basement": BasementSpec, "p_shape": ShapeSpec, "p_towers": TowerSpec, "p_free": FreeformSpec}
+         "p_walls": WallSpec, "p_basement": BasementSpec, "p_shape": ShapeSpec, "p_towers": TowerSpec, "p_free": FreeformSpec, "p_defects": DefectSpec}
 STRUCTURES = ("cadre", "pereti_izolati", "pereti_cuplati", "dual", "nucleu", "neregulat", "turnuri",
               "cerc", "semicerc", "elipsa", "spline", "trapez", "piramida", "piramida_trepte")
 
@@ -51,6 +52,7 @@ class ModelSpec:
     p_shape: ShapeSpec = field(default_factory=ShapeSpec)
     p_towers: TowerSpec = field(default_factory=TowerSpec)
     p_free: FreeformSpec = field(default_factory=FreeformSpec)
+    p_defects: DefectSpec = field(default_factory=DefectSpec)
 
     # ---- acces plat: spec.stories, spec.wall_t, ...
     def __getattr__(self, name: str):

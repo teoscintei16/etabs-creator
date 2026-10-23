@@ -11,6 +11,7 @@ def wall_panels(c: Ctx, idx: int) -> None:
     for w in c.plan.wall_panels(idx):
         name, px, py = c.add_panel(w["axis"], w["line"], w["bay"], st.z_bot, st.z_top, c.sec["wall"], "perete")
         ok(c.sap.AreaObj.SetPier(name, w["pier"]), "AreaObj.SetPier")
+        c.pier_areas.append((name, w["pier"]))
         c.bump("pereti")
         if idx == 0:
             c.restrain_panel_base(name)

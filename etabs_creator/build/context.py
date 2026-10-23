@@ -27,6 +27,8 @@ class Ctx:
     beams: list[str] = field(default_factory=list)          # grinzi + centuri + grinzi de cuplare (insertie sus-centru)
     soil_areas: list[tuple[str, str, str]] = field(default_factory=list)      # (arie, axa, parte)
     spandrels: set[str] = field(default_factory=set)
+    slabs: list[str] = field(default_factory=list)          # numele placilor (pentru defecte)
+    pier_areas: list[tuple[str, str]] = field(default_factory=list)   # (arie perete, eticheta Pier)
 
     def bump(self, key: str, n: int = 1) -> None:
         self.count[key] = self.count.get(key, 0) + n
