@@ -6,7 +6,8 @@ from dataclasses import dataclass
 from ..connect import GenError
 
 # clasa betonului -> (fck [kN/m2], Ecm [kN/m2]) conform EN 1992-1-1
-CONCRETE = {"C20/25": (20e3, 30e6), "C25/30": (25e3, 31e6), "C30/37": (30e3, 33e6), "C35/45": (35e3, 34e6), "C40/50": (40e3, 35e6)}
+CONCRETE = {"C20/25": (20e3, 30e6), "C25/30": (25e3, 31e6), "C30/37": (30e3, 33e6), "C35/45": (35e3, 34e6), "C40/50": (40e3, 35e6),
+            "C50/60": (50e3, 37e6), "C60/75": (60e3, 39e6), "C70/85": (70e3, 41e6), "C80/95": (80e3, 42e6)}
 
 
 @dataclass

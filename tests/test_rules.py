@@ -89,6 +89,17 @@ class CalibrationTests(unittest.TestCase):
         self.assertTrue(any("forțe statice calibrate" in n for n in res["notes"]))
         self.assertEqual(len(sap.calls("File.Save")), 2)                                         # salvat inainte si dupa calibrare
 
+    def test_dynamic_spectrum_is_scaled_up_to_085_of_the_static_base_shear(self):
+        with tempfile.TemporaryDirectory() as d:
+            sap, res = build(stories=3, bays=2, travei=2, out_path=Path(d) / "m.EDB", calibrate_static=True)
+        uc = {r["Name"]: float(r["C"]) for r in sap.DatabaseTables.t["Load Pattern Definitions - Auto Seismic - User Coefficient"][1]}
+        c_old = 0.12143                                                                     # coeficientul initial (platou), inainte de calibrare
+        kx = 0.85 * 1.01 * 1000.0 * uc["EXP"] / c_old / 500.0                               # Fb static creste/scade cu C; dinamic 500 kN
+        loads = {a[0]: a for a in sap.calls("RS.SetLoads")}
+        self.assertAlmostEqual(loads["SPECX"][4][0], kx, 4)                                 # factorul principal
+        self.assertAlmostEqual(loads["SPECX"][4][1], 0.3 * kx, 4)                           # componenta ortogonala scalata la fel
+        self.assertTrue(any("spectru amplificat" in n for n in res["notes"]))
+
     def test_can_be_disabled_and_needs_a_saved_file(self):
         with tempfile.TemporaryDirectory() as d:
             sap, _ = build(stories=3, bays=2, travei=2, out_path=Path(d) / "m.EDB")

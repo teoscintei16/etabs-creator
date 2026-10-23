@@ -37,6 +37,9 @@ def _geometry(c: Ctx) -> None:
 def build_model(sap, spec: ModelSpec, out_path: str | Path | None = None) -> dict:
     """Creeaza modelul in `sap` (cSapModel) si il salveaza la `out_path`. Intoarce un sumar (obiecte create, note, parametrii proiectului)."""
     spec = spec.validate()
+    if spec.tall:
+        from .tall import build_tall
+        return build_tall(sap, spec, out_path)
     if spec.opera:
         from .opera import build_opera
         return build_opera(sap, spec, out_path)

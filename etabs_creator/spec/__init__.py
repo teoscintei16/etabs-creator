@@ -16,15 +16,16 @@ from .sections import CONCRETE, SectionSpec
 from .seismic import SeismicSpec
 from .shape import ShapeSpec
 from .stiffness import StiffnessSpec
+from .tall import TallSpec
 from .towers import TowerSpec
 from .walls import CORE_SHAPES, WallSpec
 
 # numele partilor au prefix „p_” ca sa nu intre in conflict cu campurile plate (ex. campul `seismic`, `walls`, `basement`, `towers`, `shape`)
 PARTS = {"p_grid": GridSpec, "p_sections": SectionSpec, "p_loads": LoadSpec, "p_stiffness": StiffnessSpec, "p_seismic": SeismicSpec,
          "p_walls": WallSpec, "p_basement": BasementSpec, "p_shape": ShapeSpec, "p_towers": TowerSpec, "p_free": FreeformSpec, "p_defects": DefectSpec,
-         "p_opera": OperaSpec}
+         "p_opera": OperaSpec, "p_tall": TallSpec}
 STRUCTURES = ("cadre", "pereti_izolati", "pereti_cuplati", "dual", "nucleu", "neregulat", "turnuri",
-              "cerc", "semicerc", "elipsa", "spline", "trapez", "piramida", "piramida_trepte", "opera")
+              "cerc", "semicerc", "elipsa", "spline", "trapez", "piramida", "piramida_trepte", "opera", "turn_inalt")
 
 
 def _field_owner() -> dict[str, str]:
@@ -56,6 +57,7 @@ class ModelSpec:
     p_free: FreeformSpec = field(default_factory=FreeformSpec)
     p_defects: DefectSpec = field(default_factory=DefectSpec)
     p_opera: OperaSpec = field(default_factory=OperaSpec)
+    p_tall: TallSpec = field(default_factory=TallSpec)
 
     # ---- acces plat: spec.stories, spec.wall_t, ...
     def __getattr__(self, name: str):
@@ -97,6 +99,12 @@ class ModelSpec:
             raise GenError(f"Tip de structură necunoscut: {self.structure}")
         for p in PARTS:
             getattr(self, p).validate()
+        if self.tall:                             # turn in Y: geometrie proprie (fara grila ortogonala si plan liber)
+            if self.free_shape or self.opera:
+                raise GenError("„turn_inalt” nu se combină cu plan liber sau operă.")
+            from ..tall.zones import parse_zones
+            parse_zones(self)
+            return self
         if self.opera:                            # podium ortogonal + coji: validarile cer grila (alinierea cojilor cu liniile ei)
             from ..shells.layout import build_layout
             if self.free_shape:

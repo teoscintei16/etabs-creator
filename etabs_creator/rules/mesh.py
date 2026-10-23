@@ -11,7 +11,7 @@ AREA_TABLES = (("Area Assignments - Floor Auto Mesh Options", "Default"), ("Area
 
 def floor_option(spec) -> str:
     """„General” la planuri libere (Rectangular pe sectoare/trapeze lasa elemente-ciobuc cu raport de aspect mare), altfel „Rectangular”."""
-    return ("General" if spec.free_shape else "Rectangular") if spec.mesh_floor == "auto" else spec.mesh_floor
+    return ("General" if spec.free_shape or spec.tall else "Rectangular") if spec.mesh_floor == "auto" else spec.mesh_floor
 
 
 def apply_mesh(sap, mesh_max: float, option: str = "Rectangular") -> str:

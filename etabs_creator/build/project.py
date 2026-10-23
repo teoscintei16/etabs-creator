@@ -7,7 +7,7 @@ from pathlib import Path
 
 def project_params(spec) -> dict:
     out = {"ag": spec.ag, "gamma_I": spec.gamma_I, "beta0": spec.beta0, "Tb": spec.Tb, "Tc": spec.Tc, "Td": spec.Td, "q": spec.q,
-           "lambda_mfse": spec.lam, "ecc": spec.ecc, "basement": "nu", "tip_cladire": "incarcari_grele" if spec.opera else ("rezidential_pereti" if spec.walls else "rezidential_cadre")}
+           "lambda_mfse": spec.lam, "ecc": spec.ecc, "basement": "nu", "tip_cladire": "incarcari_grele" if spec.opera else ("rezidential_pereti" if spec.walls or spec.tall else "rezidential_cadre")}
     if spec.basement:
         out.update({"basement": "da", "basement_stories": [f"S{k}" for k in range(1, spec.basement + 1)], "ground_story": "P"})
     return out

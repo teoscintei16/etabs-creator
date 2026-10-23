@@ -6,6 +6,8 @@ from ..plan.towers import above_count
 
 
 def modes_needed(spec) -> int:
+    if spec.modes_total:
+        return spec.modes_total
     return spec.modes_per_story * (above_count(spec) + (spec.shell_stories if spec.opera else 0))
 
 

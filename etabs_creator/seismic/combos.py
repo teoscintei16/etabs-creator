@@ -21,9 +21,10 @@ def wind_combos(has_perm: bool, wind: list[str], p: SeismicParams, gamma_g: floa
     permu = [("Permanenta", gamma_g)] if has_perm else []
     out: list[Combo] = []
     for w in wind:
-        out += [(f"ULS_{w}", [("Dead", gamma_g), *permu, ("Live", 0.7 * gamma_q), (w, gamma_q)]),
-                (f"ULS_{w}_fav", [("Dead", 1.0), *perm, (w, gamma_q)]),
-                (f"SLS_{w}", [("Dead", 1.0), *perm, ("Live", 0.7), (w, 1.0)])]
+        for sign, tag in ((1.0, ""), (-1.0, "_neg")):
+            out += [(f"ULS_{w}{tag}", [("Dead", gamma_g), *permu, ("Live", 0.7 * gamma_q), (w, sign * gamma_q)]),
+                    (f"ULS_{w}_fav{tag}", [("Dead", 1.0), *perm, (w, sign * gamma_q)]),
+                    (f"SLS_{w}{tag}", [("Dead", 1.0), *perm, ("Live", 0.7), (w, sign)])]
     return out
 
 

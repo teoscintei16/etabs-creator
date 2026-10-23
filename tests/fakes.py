@@ -16,6 +16,9 @@ class Rec:
                     return [a[1], a[2], a[3], f"A{self._s['n']}", 0]        # ca in COM real: tablourile ref sunt returnate
                 self._s.setdefault("frames", []).append(f"O{self._s['n']}")
                 return [f"O{self._s['n']}", 0]
+            if name == "AddCartesian":
+                self._s["n"] += 1
+                return [f"P{self._s['n']}", 0]
             if name == "GetPoints":
                 if self._p.startswith("AreaObj"):
                     return [4, tuple(f"{a[0]}{c}" for c in "abcd"), 0]
@@ -44,6 +47,9 @@ class FakeTables:
                                            dict(UniqueName="p2", IsAuto="No", IsSpecial="No", X="5", Y="0", Z="3"),
                                            dict(UniqueName="p3", IsAuto="No", IsSpecial="No", X="10", Y="0", Z="3"),
                                            dict(UniqueName="p4", IsAuto="Yes", IsSpecial="Yes", X="1.234", Y="2", Z="3")]),
+            "Shell Uniform Load Sets": (["Name", "LoadPattern", "LoadValue", "GUID"], []),
+            "Area Load Assignments - Uniform Load Sets": (["UniqueName", "LoadSet"], []),
+            "Group Assignments": (["GroupName", "ObjectType", "UniqueName"], []),
             "Mass Source Definition": (["Name", "IsDefault", "IncLateral", "IncVertical", "LumpMass", "SourceSelf", "SourceAdded", "SourceLoads",
                                         "MoveMass", "LoadPattern", "Multiplier"], [dict(Name="MsSrc1", SourceLoads="No")]),
             "Functions - Response Spectrum - User Defined": (["Name", "Period", "Value", "DampRatio"], [dict(Name="UnifRS", Period="0", Value="1", DampRatio="0.05")]),
@@ -80,7 +86,21 @@ class FakeTables:
         self.pending = []
         return [0, 0, 0, 0, "", 0]
 
+    def SetLoadCasesSelectedForDisplay(self, cases):
+        self.selected = list(cases)
+        return 0
+
+    def SetLoadCombinationsSelectedForDisplay(self, combos):
+        return 0
+
+    base_shear = {"EXP": ("FX", 1000.0), "EYP": ("FY", 1000.0), "SPECX": ("FX", 500.0), "SPECY": ("FY", 900.0)}
+
     def GetTableForDisplayArray(self, key, g, grp, v, f, n, d):
+        if key == "Base Reactions":
+            rows = [(c, *self.base_shear[c]) for c in getattr(self, "selected", []) if c in self.base_shear]
+            fields = ("OutputCase", "FX", "FY")
+            data = [x for c, fld, val in rows for x in (c, str(val) if fld == "FX" else "0", str(val) if fld == "FY" else "0")]
+            return [0, 0, fields, len(rows), tuple(data), 0]
         if key != "Modal Participating Mass Ratios":
             return [(), 0, (), 1]
         rows = self.modal
@@ -95,10 +115,11 @@ class FakeSap:
     def __init__(self, filename=""):
         self.s = {"calls": [], "n": 0}
         self.filename = filename
-        for n in ("File", "PropMaterial", "PropFrame", "PropArea", "FrameObj", "AreaObj", "PointObj", "Diaphragm", "View", "RespCombo", "PierLabel", "SpandrelLabel", "Analyze"):
+        for n in ("File", "PropMaterial", "PropFrame", "PropArea", "FrameObj", "AreaObj", "PointObj", "Diaphragm", "View", "RespCombo", "PierLabel", "SpandrelLabel", "Analyze", "GroupDef"):
             setattr(self, n, Rec(self.s, n + "."))
         self.LoadPatterns = Rec(self.s, "LoadPatterns.")
-        self.LoadCases = type("LC", (), {"ModalEigen": Rec(self.s, "ModalEigen."), "ModalRitz": Rec(self.s, "Ritz."), "ResponseSpectrum": Rec(self.s, "RS.")})()
+        self.LoadCases = type("LC", (), {"ModalEigen": Rec(self.s, "ModalEigen."), "ModalRitz": Rec(self.s, "Ritz."), "ResponseSpectrum": Rec(self.s, "RS."),
+                                                   "StaticNonlinearStaged": Rec(self.s, "Staged.")})()
         self.Story = type("St", (), {"GetNameList": staticmethod(lambda: self.story_names()), "SetStories_2": staticmethod(self.set_stories)})()
         self.DatabaseTables = FakeTables(lambda: self.s.get("frames", []))
 
