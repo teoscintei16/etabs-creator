@@ -28,9 +28,11 @@ Modelele se salvează în `generated_models/`, iar parametrii seismici și centu
 | `build/` | crearea obiectelor în ETABS, nivel cu nivel (stâlpi/grinzi, pereți, subsol, planșee, rezemare) |
 | `rules/` | regulile aplicate după geometrie: fisurare, zone rigide, mesh, masă, moduri, spectru, forțe statice, combinații, calibrare |
 | `defects/` | defecte intenționate (`defects=nume1,nume2`) pentru a testa reparațiile verificatorului: moduri puține, Ritz fără accelerații, DOF oprite, mesh nestandard etc. |
+| `shells/` | coji sferice cu coaste (Opera din Sydney): centrul sferei din 3 varfuri, reteaua petecului, amplasarea salilor si a cojilor pe grila podiumului (calcule pure; vezi `docs/OPERA_CONCEPT.md`) |
 | `server/` | API FastAPI (`recovery.py`: ETABS repornit la fiecare 8 modele și reîncercare la „Invalid pointer”) și pagina simplă (`static/`) |
 
 Mesh-ul plăcilor: `mesh_floor=auto` → „General” la planuri libere (Rectangular lasă elemente-ciobuc), altfel „Rectangular”.
+Opera: `structure=opera` (podium + 2 sali + 14 coji sferice cu coaste, 4 niveluri de coji, vant si temperatura); presetarea completa si rularea de la cap la cap: `scripts/opera.py` din proiectul etabs-check.
 Testarea cu verificatorul (matrice de structuri, reparații de la cap la cap): `scripts/` din proiectul etabs-check.
 
 Testele nu au nevoie de ETABS (obiecte false): `python -m unittest discover -s tests -t .`

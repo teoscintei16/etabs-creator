@@ -41,7 +41,7 @@ def build(req: BuildRequest):
         t0 = time.time()
         res = build_with_recovery(lambda: build_model(STATE["obj"].SapModel, spec, default_path(spec, OUT_DIR)))
         res["seconds"] = round(time.time() - t0, 1)
-        res["sidecar"] = write_settings(res["file"], res["project"], res.get("belts")) if res["file"] and res["project"] else None
+        res["sidecar"] = write_settings(res["file"], res["project"], res.get("belts"), res.get("params")) if res["file"] and res["project"] else None
         STATE["models"].append({"file": res["file"], "objects": res["objects"], "name": spec.name, "structure": spec.structure})
         return res
     return run(_f)

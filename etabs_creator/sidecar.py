@@ -14,7 +14,7 @@ def sidecar_path(model_file: str) -> Path:
     return Path(model_file + ".checks.json")
 
 
-def write_settings(model_file: str, project: dict, belts: dict | None = None) -> str:
+def write_settings(model_file: str, project: dict, belts: dict | None = None, params: dict | None = None) -> str:
     path = sidecar_path(model_file)
     data = {}
     if path.exists():
@@ -25,5 +25,7 @@ def write_settings(model_file: str, project: dict, belts: dict | None = None) ->
     data.setdefault("project", {}).update({k: v for k, v in project.items() if v not in (None, "", [])})
     if belts:
         data["belts"] = {"has": belts["has"], "sections": list(belts["sections"])}
+    if params:                                  # standardele proprii ale modelului (ex. dimensiunea mesh-ului), „<verificare>.<parametru>”
+        data.setdefault("params", {}).update(params)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     return str(path)

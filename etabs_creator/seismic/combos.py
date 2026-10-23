@@ -15,6 +15,18 @@ def gravity_combos(has_perm: bool, p: SeismicParams, gamma_g: float, gamma_q: fl
             ("SLS_QP", [("Dead", 1.0), *perm, ("Live", p.psi2), *[(e, 1.0) for e in extra_perm]])]
 
 
+def wind_combos(has_perm: bool, wind: list[str], p: SeismicParams, gamma_g: float, gamma_q: float) -> list[Combo]:
+    """Vant: ULS cu permanent defavorabil si cu permanent favorabil (ridicare), SLS caracteristica. Utila cu ψ0 = 0,7."""
+    perm = [("Permanenta", 1.0)] if has_perm else []
+    permu = [("Permanenta", gamma_g)] if has_perm else []
+    out: list[Combo] = []
+    for w in wind:
+        out += [(f"ULS_{w}", [("Dead", gamma_g), *permu, ("Live", 0.7 * gamma_q), (w, gamma_q)]),
+                (f"ULS_{w}_fav", [("Dead", 1.0), *perm, (w, gamma_q)]),
+                (f"SLS_{w}", [("Dead", 1.0), *perm, ("Live", 0.7), (w, 1.0)])]
+    return out
+
+
 def seismic_combos(has_perm: bool, static: list[str], rs: list[str], p: SeismicParams) -> list[Combo]:
     """G + ψ2·Q ± E: pure (±) si cu componenta ortogonala ±orth·E. Partea gravitationala = multiplicatorii sursei de masa."""
     perm = [("Permanenta", 1.0)] if has_perm else []
@@ -36,5 +48,6 @@ def seismic_combos(has_perm: bool, static: list[str], rs: list[str], p: SeismicP
 
 
 def combos(has_perm: bool, static: list[str], rs: list[str], p: SeismicParams, gamma_g: float = 1.35, gamma_q: float = 1.5,
-           extra_perm: list[str] | tuple[str, ...] = ()) -> list[Combo]:
-    return gravity_combos(has_perm, p, gamma_g, gamma_q, list(extra_perm)) + seismic_combos(has_perm, static, rs, p)
+           extra_perm: list[str] | tuple[str, ...] = (), wind: list[str] | tuple[str, ...] = ()) -> list[Combo]:
+    return (gravity_combos(has_perm, p, gamma_g, gamma_q, list(extra_perm)) + wind_combos(has_perm, list(wind), p, gamma_g, gamma_q)
+            + seismic_combos(has_perm, static, rs, p))

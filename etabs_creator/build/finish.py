@@ -22,7 +22,7 @@ def apply_rules(c: Ctx, extra_perm: list[str]) -> list[str]:
         top = ok(sap.Story.GetNameList(), "Story.GetNameList")[1][0]            # primul = nivelul cel mai de sus
         static, cases, extra = apply_seismic(sap, spec, top, "S1" if spec.basement else "Base")   # cu subsol, fortele seismice incep de la S1 (±0.00)
         notes += extra
-    notes.append(f"{apply_combinations(sap, spec, has_perm, static, cases, extra_perm)} combinații (ULS, SLS, seismice)")
+    notes.append(f"{apply_combinations(sap, spec, has_perm, static, cases, extra_perm, c.variable)} combinații (ULS, SLS, seismice)")
     if spec.basement and spec.soil_pressure:
         notes.append(f"subsol {spec.basement} niveluri: pereți perimetrali {spec.basement_wall_t * 100:g} cm, "
                      f"împingerea pământului {spec.soil_pressure:g} kN/m² (uniformă)")
@@ -44,4 +44,5 @@ def save_and_summarize(c: Ctx, notes: list[str], base_nodes: int, out_path: str 
             ok(sap.File.Save(str(path)), "File.Save (după calibrare)")
     return {"spec": spec.to_flat(), "sections": c.sec, "objects": c.count, "base_nodes": base_nodes, "file": str(path) if path else None,
             "notes": notes, "project": project_params(spec) if spec.seismic else {},
-            "belts": {"has": True, "sections": [c.sec["belt"]]} if "belt" in c.sec else None, **extra}
+            "belts": {"has": True, "sections": [c.sec["belt"]]} if "belt" in c.sec else None,
+            "params": {"r5_mesh.mesh_max": spec.mesh_max} if spec.mesh_max != 0.5 else {}, **extra}

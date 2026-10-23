@@ -29,6 +29,9 @@ class Ctx:
     spandrels: set[str] = field(default_factory=set)
     slabs: list[str] = field(default_factory=list)          # numele placilor (pentru defecte)
     pier_areas: list[tuple[str, str]] = field(default_factory=list)   # (arie perete, eticheta Pier)
+    skip_columns: set[tuple[int, int, int]] = field(default_factory=set)       # (nivel, ix, iy): stalpi omisi (ex. in interiorul salilor)
+    skip_beams: set[tuple[int, str, int, int]] = field(default_factory=set)    # (nivel, "X"|"Y", linia, deschiderea): grinzi omise
+    variable: list[str] = field(default_factory=list)       # tipare variabile suplimentare (vant, temperatura): intra in combinatii
 
     def bump(self, key: str, n: int = 1) -> None:
         self.count[key] = self.count.get(key, 0) + n

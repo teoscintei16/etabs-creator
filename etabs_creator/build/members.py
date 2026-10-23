@@ -9,6 +9,8 @@ def columns_and_beams(c: Ctx, idx: int) -> None:
     st = c.plan.stories[idx]
     xs, ys, z0, z1 = c.xs, c.ys, st.z_bot, st.z_top
     for ix, iy in c.plan.columns(idx):
+        if (idx, ix, iy) in c.skip_columns:
+            continue
         name = c.add_frame((xs[ix], ys[iy], z0), (xs[ix], ys[iy], z1), c.sec["column"], "stâlp")
         c.frames.append(name)
         c.bump("stalpi")
@@ -16,10 +18,14 @@ def columns_and_beams(c: Ctx, idx: int) -> None:
             c.base_points.append(ok(c.sap.FrameObj.GetPoints(name), "GetPoints")[0])
     bx, by = c.plan.beams(idx)
     for iy, i in bx:
+        if (idx, "X", iy, i) in c.skip_beams:
+            continue
         c.frames.append(c.add_frame((xs[i], ys[iy], z1), (xs[i + 1], ys[iy], z1), c.sec["beam"], "grindă X"))
         c.beams.append(c.frames[-1])
         c.bump("grinzi")
     for ix, j in by:
+        if (idx, "Y", ix, j) in c.skip_beams:
+            continue
         c.frames.append(c.add_frame((xs[ix], ys[j], z1), (xs[ix], ys[j + 1], z1), c.sec["beam"], "grindă Y"))
         c.beams.append(c.frames[-1])
         c.bump("grinzi")
